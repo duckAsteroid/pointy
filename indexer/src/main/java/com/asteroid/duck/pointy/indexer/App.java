@@ -1,5 +1,7 @@
 package com.asteroid.duck.pointy.indexer;
 
+import com.asteroid.duck.pointy.indexer.checksum.CRC32Impl;
+import com.asteroid.duck.pointy.indexer.checksum.Checksum;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -20,10 +22,11 @@ public class App {
     public static void main(String[] args) throws IOException {
         if (args.length >= 2) {
             Path outputDir = Paths.get(args[0]);
+            Checksum checksum = new CRC32Impl();
             FSDirectory d = FSDirectory.open(outputDir.resolve("index"));
             IndexWriterConfig conf = new IndexWriterConfig(new StandardAnalyzer());
             IndexWriter writer = new IndexWriter(d, conf);
-            try(Indexer indexer = new Indexer(writer, outputDir)) {
+            try(Indexer indexer = new Indexer(writer, checksum, outputDir)) {
                 BaseProgressMonitor monitor = new BaseProgressMonitor(args.length - 1);
                 Slf4JProgress progress = new Slf4JProgress(LOG, SimpleProgressFormat.DEFAULT, Slf4JProgress.Level.INFO);
                 monitor.addProgressMonitorListener(progress);

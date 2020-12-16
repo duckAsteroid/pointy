@@ -1,9 +1,8 @@
 package com.asteroid.duck.pointy.indexer;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import com.asteroid.duck.pointy.indexer.checksum.Checksum;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.*;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -31,8 +30,6 @@ import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedInputStream;
 
 import static com.asteroid.duck.pointy.indexer.Fields.*;
 
@@ -41,11 +38,13 @@ public class Indexer implements AutoCloseable {
 
     private final IndexWriter writer;
     private final Path outputDir;
+    private final Checksum checksum;
     private final double scale = 1.0;
     private static final String FORMAT = "JPG";
 
-    public Indexer(IndexWriter writer, Path outputDir) {
+    public Indexer(IndexWriter writer, Checksum checksum, Path outputDir) {
         this.writer = writer;
+        this.checksum = checksum;
         this.outputDir = outputDir;
     }
 
@@ -103,8 +102,8 @@ public class Indexer implements AutoCloseable {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Optional<FileType> type = FileType.match(file);
                 if (type.isPresent()) {
-                    final String checksum = checksum(file);
-                    result.put(checksum, file);
+                    final String csValue = checksum.compute(file);
+                    result.put(csValue, file);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -121,18 +120,6 @@ public class Indexer implements AutoCloseable {
             }
         });
         return result;
-    }
-
-    private String checksum(Path path) throws IOException {
-        CRC32 crc = new CRC32();
-        try (CheckedInputStream checkedInputStream = new CheckedInputStream(new FileInputStream(path.toFile()), crc))
-        {
-            checkedInputStream.transferTo(OutputStream.nullOutputStream());
-            final String hex = Long.toHexString(checkedInputStream.getChecksum().getValue());
-            LOG.debug(path.toString()+": "+hex);
-            return hex;
-        }
-
     }
 
     private boolean indexContent(final String checksum, final SlideShow<?, ?> ss, Document document) throws IOException {
