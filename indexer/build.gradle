@@ -1,0 +1,23 @@
+apply plugin: 'application'
+
+java {
+    mainClassName = 'com.asteroid.duck.pointy.indexer.App'
+}
+
+dependencies {
+    implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30')
+
+    runtime( group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3')
+    runtime( group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1')
+    runtime('org.glassfish.jaxb:jaxb-runtime:2.3.1')
+    runtime('org.apache.xmlgraphics:batik-all:1.13')
+
+    implementation('com.asteroid.duck.progress:api:1.1.0')
+    implementation('com.asteroid.duck.progress:client:1.1.0')
+    implementation('com.asteroid.duck.progress:slf4j:1.1.0')
+    implementation( group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2')
+    implementation( group: 'org.apache.poi', name: 'poi-scratchpad', version: '4.1.2')
+    implementation( group: 'commons-codec', name: 'commons-codec', version: '1.15')
+    implementation( group: 'commons-io', name: 'commons-io', version: '2.8.0')
+
+}
