@@ -1,19 +1,17 @@
 package com.asteroid.duck.pointy.indexer;
 
+import com.asteroid.duck.pointy.Config;
 import org.apache.lucene.index.IndexableField;
-import org.apache.poi.sl.usermodel.Slide;
 
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * The interface to a stage in the indexing pipeline
  */
 public interface PipelineStage {
-    /**
-     * Given a slide in a powerpoint extract some field for the index
-     * @param slide the slide to index
-     * @return the field for the document index
-     */
-    Stream<IndexableField> extract(Slide<?,?> slide);
+    String CHECKSUM_FIELD = "checksum";
+    String FILENAME_FIELD = "filename";
+
+    List<IndexableField> index(Config cfg);
 }

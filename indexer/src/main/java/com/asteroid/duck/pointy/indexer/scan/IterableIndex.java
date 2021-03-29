@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * A view of an index that provides an iterator over the documents
+ * A view of an index that provides an iterator over the documents.
+ *
  */
 public class IterableIndex implements Iterable<Document> {
     private final IndexReader reader;

@@ -5,9 +5,12 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 
 public enum IndexDocType {
+
     SLIDESHOW, SLIDE;
 
+    public static final String FIELD_NAME = "DocType";
+
     public IndexableField asField() {
-        return new StringField(Fields.TYPE.name(), name(), Field.Store.YES);
+        return new StringField(FIELD_NAME, name(), Field.Store.YES);
     }
 }
