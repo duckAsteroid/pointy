@@ -1,4 +1,4 @@
-package com.asteroid.duck.pointy.indexer;
+package com.asteroid.duck.pointy;
 
 public enum FileType {
 
@@ -10,4 +10,7 @@ public enum FileType {
         this.suffix = suffix;
     }
 
+    public String getSuffix() {
+        return suffix;
+    }
 }

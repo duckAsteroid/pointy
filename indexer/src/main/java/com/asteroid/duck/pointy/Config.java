@@ -5,6 +5,7 @@ import com.asteroid.duck.pointy.indexer.metadata.MetaDataField;
 import lombok.Data;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -15,9 +16,24 @@ public class Config {
     private final Checksum checksum;
     private final Path database;
     private final Set<Path> scanRoots;
-    private final Set<String> suffixes;
+    private final Set<FileType> fileTypes;
     private final Set<MetaDataField> metaDataFields;
     private final Set<OptionalField> slideFields;
     private final Set<OptionalField> showFields;
 
+    public static final OptionalField[] TEXT = {OptionalField.CONTENT, OptionalField.TITLE};
+
+    public static final OptionalField[] IMAGE = {OptionalField.IMAGE, OptionalField.IMAGE_COLOR_SPACE};
+
+    public boolean isSlideTextIndexed() {
+        return Arrays.stream(TEXT).anyMatch(slideFields::contains);
+    }
+
+    public boolean isSlideImageIndexed() {
+        return Arrays.stream(IMAGE).anyMatch(slideFields::contains);
+    }
+
+    public Path getSlideFolder(String checksum) {
+        return database.resolve("images/"+checksum);
+    }
 }

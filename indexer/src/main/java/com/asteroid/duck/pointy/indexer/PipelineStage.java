@@ -4,7 +4,6 @@ import com.asteroid.duck.pointy.Config;
 import org.apache.lucene.index.IndexableField;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * The interface to a stage in the indexing pipeline

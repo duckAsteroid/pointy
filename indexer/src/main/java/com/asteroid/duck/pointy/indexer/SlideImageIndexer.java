@@ -19,6 +19,7 @@ public class SlideImageIndexer implements PipelineStage {
 
     @Override
     public List<IndexableField> index(Config cfg) {
+        // FIXME Actually create the image
         return Collections.emptyList();
     }
 

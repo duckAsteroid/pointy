@@ -7,5 +7,6 @@ public enum OptionalField {
     SLIDE_NO,
     TITLE,
     CONTENT,
-    IMAGE;
+    IMAGE,
+    IMAGE_COLOR_SPACE;
 }

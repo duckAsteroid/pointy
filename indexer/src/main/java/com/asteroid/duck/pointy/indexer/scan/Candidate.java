@@ -7,9 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * Represents a file in the file system together with it's computed checksum
@@ -40,5 +44,9 @@ public class Candidate {
             }
             return Optional.ofNullable(candy);
         }).filter(Optional::isPresent).map(Optional::get);
+    }
+
+    public static Map<String, List<Path>> scanResult(Stream<Candidate> stream) {
+        return stream.collect(groupingBy(Candidate::getChecksum, mapping(Candidate::getPath, toList())));
     }
 }

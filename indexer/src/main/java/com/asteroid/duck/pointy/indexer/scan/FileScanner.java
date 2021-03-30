@@ -1,5 +1,6 @@
 package com.asteroid.duck.pointy.indexer.scan;
 
+import com.asteroid.duck.pointy.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +20,8 @@ public class FileScanner {
     /** Used to filter out only the files of interest */
     private final Predicate<Path> fileFilter;
 
-    public FileScanner(final Set<String> suffixes) {
-        this.fileFilter = path -> suffixes.stream().anyMatch(path::endsWith);
+    public FileScanner(final Set<FileType> suffixes) {
+        this.fileFilter = path -> suffixes.stream().map(FileType::getSuffix).anyMatch(path::endsWith);
     }
 
     /**

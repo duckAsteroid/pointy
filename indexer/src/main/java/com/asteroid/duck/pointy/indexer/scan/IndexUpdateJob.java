@@ -1,13 +1,13 @@
 package com.asteroid.duck.pointy.indexer.scan;
 
-import com.asteroid.duck.pointy.indexer.scan.actions.AddFileToDocument;
-import com.asteroid.duck.pointy.indexer.scan.actions.IndexAction;
-import com.asteroid.duck.pointy.indexer.scan.actions.NewFile;
-import com.asteroid.duck.pointy.indexer.scan.actions.RemoveFileFromDocument;
+import com.asteroid.duck.pointy.indexer.scan.actions.*;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * A single instance of index updating (to match file system)
@@ -15,41 +15,49 @@ import java.util.stream.Stream;
  * From this calculates what actions need to be performed in this job
  */
 public class IndexUpdateJob {
-    /** Filenames, and their hashes - that we already have in the index */
-    private final Map<String, String> currentFileHashes;
-    private final Set<String> currentHashes;
-
+    /** The files in the index, by their file content hash */
+    Map<String, List<String>> filesByHash;
+    /** the resulting index actions for each file */
     private final Collection<IndexAction> actions = new LinkedList<>();
 
-    public IndexUpdateJob(Map<String, String> currentFileHashes) {
-        this.currentFileHashes = currentFileHashes;
-        this.currentHashes = new HashSet<>(currentFileHashes.values());
+    public IndexUpdateJob(Map<String, List<String>> filesByHash) {
+        this.filesByHash = filesByHash;
     }
 
     public void process(Stream<Candidate> candidateStream) {
-        candidateStream.forEach(this::process);
+        Map<String, List<Path>> scanResult = Candidate.scanResult(candidateStream);
+        for(Map.Entry<String, List<Path>> entry : scanResult.entrySet()) {
+            String hash = entry.getKey();
+            if (filesByHash.containsKey(hash)) {
+                // hash exists in current index
+                // check the filenames
+                List<String> filenames = entry.getValue().stream().map(IndexUpdateJob::pathString).collect(toList());
+                List<String> currentFiles = filesByHash.get(hash);
+                if(filenames.containsAll(currentFiles) && currentFiles.containsAll(filenames)) {
+                    // same lists ...
+                    actions.add(new DoNothingAction(hash));
+                }
+                else {
+                    actions.add(new UpdateDocumentPaths(hash, filenames));
+                }
+            }
+            else {
+                // new file
+                actions.add(new NewFileAction(hash, entry.getValue()));
+            }
+        }
+        Set<String> newHashes = scanResult.keySet();
+        Set<String> hashes = new HashSet<>(filesByHash.keySet());
+        // by taking the "new hashes" away from the old - we are left with those that can be purged
+        boolean difference = hashes.removeAll(newHashes);
+        actions.addAll(hashes.stream().map(RemoveFromIndexAction::new).collect(toList()));
     }
 
-    public void process(Candidate c) {
-        final String filename = c.getPath().toString();
-        final String checksum = c.getChecksum();
-        if(!currentFileHashes.containsKey(filename)) {
-            newOrUpdatedFile(checksum, filename);
-        }
-        else {
-            final String currentHash = currentFileHashes.get(filename);
-            // remove from current
-            actions.add(new RemoveFileFromDocument(currentHash, filename));
-            newOrUpdatedFile(checksum, filename);
-        }
+    public static String pathString(Path path) {
+        return path.toString();
     }
 
-    private void newOrUpdatedFile(String checksum, String filename) {
-        if (currentHashes.contains(checksum)) {
-            actions.add(new AddFileToDocument(checksum, filename));
-        }
-        else {
-            actions.add(new NewFile(checksum, filename));
-        }
+    public Stream<IndexAction> getActions() {
+        return actions.stream();
     }
 }
