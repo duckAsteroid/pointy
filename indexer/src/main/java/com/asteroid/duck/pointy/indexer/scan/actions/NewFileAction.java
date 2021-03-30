@@ -39,19 +39,17 @@ public class NewFileAction extends IndexAction {
 
             try {
                 Document slideShowDocument = new Document();
-                slideShowDocument.add(IndexDocType.SLIDE.asField());
+                slideShowDocument.add(IndexDocType.SLIDESHOW.asField());
 
                 String filename = IndexUpdateJob.pathString(iter.next());
                 SlideShow<?, ?> slideShow = create(new File(filename));
                 SlideShowIndexer slideShowIdx = new SlideShowIndexer(checksum, slideShow, filenames);
-                List<IndexableField> slideFields = slideShowIdx.index(config);
-
+                slideShowIdx.index(config).forEach(slideShowDocument::add);
                 // filenames
                 filenames.stream()
                         .map(IndexUpdateJob::pathString)
                         .map(path -> new StringField(PipelineStage.FILENAME_FIELD, path, Field.Store.YES))
                         .forEach(slideShowDocument::add);
-                slideFields.forEach(slideShowDocument::add);
 
                 // add it to the index
                 ctx.getWriter().addDocument(slideShowDocument);
@@ -59,11 +57,11 @@ public class NewFileAction extends IndexAction {
                 // Do we need to process the slides too?
                 if (config.isSlideTextIndexed() || config.isSlideImageIndexed())
                 {
-                    Document slideDocument = new Document();
-                    slideDocument.add(IndexDocType.SLIDE.asField());
-                    // a reference to the parent
-                    slideDocument.add(new StringField("parent", checksum, Field.Store.YES));
                     for(Slide<?,?> slide : slideShow.getSlides()) {
+                        Document slideDocument = new Document();
+                        slideDocument.add(IndexDocType.SLIDE.asField());
+                        // a reference to the parent
+                        slideDocument.add(new StringField("parent", checksum, Field.Store.YES));
                         if (config.isSlideTextIndexed()) {
                             SlideTextIndexer textIndexer = new SlideTextIndexer(checksum, slide);
                             List<IndexableField> slideTextFields = textIndexer.index(config);
@@ -75,8 +73,9 @@ public class NewFileAction extends IndexAction {
                             List<IndexableField> slideImageFields = imageIndexer.index(config);
                             slideImageFields.forEach(slideDocument::add);
                         }
+                        ctx.getWriter().addDocument(slideDocument);
                     }
-                    ctx.getWriter().addDocument(slideDocument);
+                    slideShow.close();
                 }
                 break; // no more iterating
             }

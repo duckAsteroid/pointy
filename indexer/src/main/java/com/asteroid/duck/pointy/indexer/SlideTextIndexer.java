@@ -35,7 +35,7 @@ public class SlideTextIndexer implements PipelineStage {
         if(cfg.getSlideFields().contains(TITLE)) {
             String title = slide.getTitle();
             if (title != null && !title.isEmpty()) {
-                tmp.add(new StringField(TITLE.name(), title, Field.Store.YES));
+                tmp.add(new TextField(TITLE.name(), title, Field.Store.YES));
             }
         }
 

@@ -11,14 +11,16 @@ import org.apache.poi.sl.usermodel.SlideShow;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * Creates the fields for a Lucene index document from the slideshow
  */
 public class SlideShowIndexer implements PipelineStage {
 
-    private static final String PATH_FIELD = "path";
+    private static final String PATH_FIELD = "pathContent";
 
     private final String checksum;
     private final SlideShow<?, ?> slideShow;
@@ -35,7 +37,7 @@ public class SlideShowIndexer implements PipelineStage {
         LinkedList<IndexableField> tmp = new LinkedList<>();
 
         tmp.add(checksum());
-        tmp.addAll(locations());
+        tmp.add(pathContent());
 
         if (cfg.getShowFields().contains(OptionalField.CONTENT))
             tmp.add(content());
@@ -52,11 +54,12 @@ public class SlideShowIndexer implements PipelineStage {
         return new TextField(OptionalField.CONTENT.name(), extractor.getText(), Field.Store.NO);
     }
 
-    public Collection<StringField> locations() {
-        return locations.stream()
+    public TextField pathContent() {
+        String pathContent = locations.stream()
+                .flatMap(path -> StreamSupport.stream(path.spliterator(), true))
                 .map(Path::toString)
-                .map(path -> new StringField(PATH_FIELD, path, Field.Store.YES))
-                .collect(Collectors.toList());
+                .collect(joining(" "));
+        return new TextField(PATH_FIELD, pathContent, Field.Store.NO);
     }
 
     public List<IndexableField> metadata(Config cfg) {

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -21,7 +22,16 @@ public class FileScanner {
     private final Predicate<Path> fileFilter;
 
     public FileScanner(final Set<FileType> suffixes) {
-        this.fileFilter = path -> suffixes.stream().map(FileType::getSuffix).anyMatch(path::endsWith);
+        this.fileFilter = path -> {
+            String pathName = path.getFileName().toString().toLowerCase(Locale.ROOT);
+            for(FileType type : suffixes) {
+                String suffix = type.getSuffix().toLowerCase(Locale.ROOT);
+                if (pathName.endsWith(suffix)) {
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 
     /**
@@ -32,7 +42,7 @@ public class FileScanner {
     public Stream<Path> listFiles(Path path) {
         if (Files.isDirectory(path)) {
             try {
-                return Files.list(path).filter(fileFilter).flatMap(this::listFiles);
+                return Files.list(path).flatMap(this::listFiles).filter(fileFilter);
             }
             catch (IOException e) {
                 LOG.error("Error reading "+path, e);

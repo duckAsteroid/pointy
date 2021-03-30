@@ -1,6 +1,8 @@
 package com.asteroid.duck.pointy.indexer.scan;
 
 import com.asteroid.duck.pointy.indexer.scan.actions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -15,6 +17,7 @@ import static java.util.stream.Collectors.toList;
  * From this calculates what actions need to be performed in this job
  */
 public class IndexUpdateJob {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexUpdateJob.class);
     /** The files in the index, by their file content hash */
     Map<String, List<String>> filesByHash;
     /** the resulting index actions for each file */
@@ -28,6 +31,9 @@ public class IndexUpdateJob {
         Map<String, List<Path>> scanResult = Candidate.scanResult(candidateStream);
         for(Map.Entry<String, List<Path>> entry : scanResult.entrySet()) {
             String hash = entry.getKey();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Indexing content hash="+hash+" to locations: "+entry.getValue().stream().map(Path::toString).collect(Collectors.joining(",","[","]")));
+            }
             if (filesByHash.containsKey(hash)) {
                 // hash exists in current index
                 // check the filenames
