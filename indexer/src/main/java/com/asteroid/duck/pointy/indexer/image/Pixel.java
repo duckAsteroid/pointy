@@ -13,4 +13,8 @@ public class Pixel {
     public int extract(Channel ch) {
         return ch.extract(value);
     }
+
+    public int getValue() {
+        return value;
+    }
 }

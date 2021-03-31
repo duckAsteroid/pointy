@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ColourUtilsTest {
 
-    private static final ColourSpace twoBins = new ColourSpace(2);
-    private static final ColourSpace fourBins = new ColourSpace(4);
+    private static final ColourSpace.BinnedColourSpace twoBins = new ColourSpace.BinnedColourSpace(2);
+    private static final ColourSpace.BinnedColourSpace fourBins = new ColourSpace.BinnedColourSpace(4);
 
 
     @Test

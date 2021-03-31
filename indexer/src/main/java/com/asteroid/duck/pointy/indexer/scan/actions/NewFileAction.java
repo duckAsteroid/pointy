@@ -5,6 +5,7 @@ import com.asteroid.duck.pointy.indexer.*;
 import com.asteroid.duck.pointy.indexer.scan.IndexUpdateJob;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.poi.sl.usermodel.Slide;
@@ -48,7 +49,7 @@ public class NewFileAction extends IndexAction {
                 // filenames
                 filenames.stream()
                         .map(IndexUpdateJob::pathString)
-                        .map(path -> new StringField(PipelineStage.FILENAME_FIELD, path, Field.Store.YES))
+                        .map(path -> new StoredField(PipelineStage.FILENAME_FIELD, path))
                         .forEach(slideShowDocument::add);
 
                 // add it to the index

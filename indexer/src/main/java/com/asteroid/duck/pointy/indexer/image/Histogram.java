@@ -3,6 +3,7 @@ package com.asteroid.duck.pointy.indexer.image;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongBinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -13,7 +14,6 @@ public class Histogram {
 
     public Histogram(ColourSpace space) {
         this.space = space;
-        // FIXME Init counts based on colour space
         this.counts = new ArrayList<>(space.indexSize());
         for (int i = 0; i < space.indexSize(); i++) {
             counts.add(i, new AtomicLong(0));
@@ -49,15 +49,23 @@ public class Histogram {
         return counts.stream().map(AtomicLong::get).collect(Collectors.toUnmodifiableList());
     }
 
+    public static List<Double> normaliseMax(List<Long> histogram ) {
+        return normalise(histogram, Long::max);
+    }
+
+    public static List<Double> normalisePixelCount(List<Long> histogram ) {
+        return normalise(histogram, Long::sum);
+    }
     /**
      * Take a result vector and normalise it - so that most frequent bin is 1.0
      * @param histogram the histogram result vector
      * @return the normalised vector (0.0 - 1.0)
      */
-    public static List<Double> normalise(List<Long> histogram) {
-        double max = histogram.stream().mapToLong(Long::longValue).max().orElse(0);
-        return histogram.stream().map(value -> value / max).collect(Collectors.toList());
+    public static List<Double> normalise(List<Long> histogram, LongBinaryOperator relative) {
+        double denominator = histogram.stream().mapToLong(Long::longValue).reduce(relative).orElse(0);
+        return histogram.stream().map(value -> value / denominator).collect(Collectors.toList());
     }
+
 
     /**
      * Used in {@link #distance(List, List)}

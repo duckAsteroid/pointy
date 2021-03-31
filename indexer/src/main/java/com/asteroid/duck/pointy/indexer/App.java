@@ -3,6 +3,7 @@ package com.asteroid.duck.pointy.indexer;
 import com.asteroid.duck.pointy.Checksum;
 import com.asteroid.duck.pointy.Config;
 import com.asteroid.duck.pointy.FileType;
+import com.asteroid.duck.pointy.indexer.image.ColourSpace;
 import com.asteroid.duck.pointy.indexer.metadata.MetaDataField;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -33,6 +34,9 @@ public class App {
             builder.metaDataFields(MetaDataField.all());
             builder.showFields(Set.of(OptionalField.TITLE, OptionalField.CONTENT));
             builder.slideFields(OptionalField.all());
+            builder.imageScale(0.5);
+            builder.imageFormat("JPG");
+            builder.imageColourSpace(ColourSpace.BinnedColourSpace.D27);
 
             builder.database(outputDir);
 

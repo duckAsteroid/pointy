@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HistogramTest {
 
-    private final ColourSpace space = new ColourSpace(4);
+    private final ColourSpace.BinnedColourSpace space = new ColourSpace.BinnedColourSpace(4);
     private final List<Pixel> pixels = Arrays.asList(
             new Pixel(0x000000), // 0
             new Pixel(0x7F7F7F), //
@@ -75,16 +75,29 @@ class HistogramTest {
     }
 
     @Test
-    void normalise() {
+    void normaliseMax() {
         final List<Pixel> pixels = new ArrayList<>(this.pixels);
         pixels.add(new Pixel(0xFFFFFF)); // 2 FFF
 
         pixels.forEach(test::addPixel);
         List<Long> result = test.result();
-        List<Double> norm = Histogram.normalise(result);
+        List<Double> norm = Histogram.normaliseMax(result);
         assertEquals(0.5, norm.get(0), 0.0001);
         assertEquals(0.5, norm.get(42), 0.0001);
         assertEquals(1.0, norm.get(63), 0.0001);
+    }
+
+    @Test
+    void normalisePixelCount() {
+        final List<Pixel> pixels = new ArrayList<>(this.pixels);
+        pixels.add(new Pixel(0xFFFFFF)); // 2 FFF
+
+        pixels.forEach(test::addPixel);
+        List<Long> result = test.result();
+        List<Double> norm = Histogram.normalisePixelCount(result);
+        assertEquals(0.25, norm.get(0), 0.0001);
+        assertEquals(0.25, norm.get(42), 0.0001);
+        assertEquals(0.5, norm.get(63), 0.0001);
     }
 
     @Test

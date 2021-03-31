@@ -1,6 +1,7 @@
 package com.asteroid.duck.pointy;
 
 import com.asteroid.duck.pointy.indexer.OptionalField;
+import com.asteroid.duck.pointy.indexer.image.ColourSpace;
 import com.asteroid.duck.pointy.indexer.metadata.MetaDataField;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,9 @@ public class Config {
     private final Set<MetaDataField> metaDataFields;
     private final Set<OptionalField> slideFields;
     private final Set<OptionalField> showFields;
+    private final double imageScale;
+    private final String imageFormat;
+    private final ColourSpace imageColourSpace;
 
     public static final OptionalField[] TEXT = {OptionalField.CONTENT, OptionalField.TITLE};
 

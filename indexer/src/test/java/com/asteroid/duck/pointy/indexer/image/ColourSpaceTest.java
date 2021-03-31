@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ColourSpaceTest {
 
-    private final ColourSpace subject2 = new ColourSpace(3);
+    private final ColourSpace subject2 = new ColourSpace.BinnedColourSpace(3);
     private List<Integer> expected = Arrays.asList(0,
             1,
             2,
@@ -28,12 +28,21 @@ class ColourSpaceTest {
 
     @Test
     void indexSize() {
-        assertEquals(8, new ColourSpace(2).indexSize());
-        assertEquals(27, new ColourSpace(3).indexSize());
-        assertEquals(1, new ColourSpace(1).indexSize());
+        assertEquals(8, new ColourSpace.BinnedColourSpace(2).indexSize());
+        assertEquals(27, new ColourSpace.BinnedColourSpace(3).indexSize());
+        assertEquals(1, new ColourSpace.BinnedColourSpace(1).indexSize());
     }
 
     @Test
-    void colour() {
+    void coordinates() {
+        assertArrayEquals(new int[]{2,2,2}, ColourSpace.BinnedColourSpace.D27.coordinates(26));
+        assertArrayEquals(new int[]{1,1,1}, ColourSpace.BinnedColourSpace.D27.coordinates(13));
+        assertArrayEquals(new int[]{0,0,2}, ColourSpace.BinnedColourSpace.D27.coordinates(18));
+        assertArrayEquals(new int[]{0,0,0}, ColourSpace.BinnedColourSpace.D27.coordinates(0));
+    }
+
+    @Test
+    void unity() {
+        assertEquals(12345, ColourSpace.UNITY.index(new Pixel(12345)));
     }
 }
