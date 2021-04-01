@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 /**
- * A single instance of index updating (to match file system)
+ * A single instance of index updating process (trying to match what is now in file system)
  * Takes the current index (documents) and a stream of Paths
  * From this calculates what actions need to be performed in this job
  */

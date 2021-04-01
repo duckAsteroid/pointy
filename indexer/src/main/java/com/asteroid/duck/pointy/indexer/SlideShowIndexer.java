@@ -16,9 +16,9 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.joining;
 
 /**
- * Creates the fields for a Lucene index document from the slideshow
+ * Creates the text based fields for a Lucene index document from the individual slides
  */
-public class SlideShowIndexer implements PipelineStage {
+public class SlideShowIndexer implements IndexFieldProvider {
 
     private static final String PATH_FIELD = "pathContent";
 

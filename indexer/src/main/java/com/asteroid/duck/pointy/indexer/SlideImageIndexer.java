@@ -21,11 +21,13 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class SlideImageIndexer implements PipelineStage {
+/**
+ * Extracts images from the slides for subsequent analysis (and to help with the UI).
+ */
+public class SlideImageIndexer implements IndexFieldProvider {
 
     public static final String THUMBNAIL_PATH_FIELD = "thumbnailPath";
 
@@ -69,7 +71,7 @@ public class SlideImageIndexer implements PipelineStage {
                 ImageIO.write(bufferedImage, cfg.getImageFormat(), Files.newOutputStream(thumbnailPath));
                 result.add(new StoredField(THUMBNAIL_PATH_FIELD, thumbnailPath.toString()));
                 String checksum = cfg.getChecksum().apply(thumbnailPath).get();
-                result.add(new StringField(PipelineStage.CHECKSUM_FIELD, checksum, Field.Store.YES));
+                result.add(new StringField(IndexFieldProvider.CHECKSUM_FIELD, checksum, Field.Store.YES));
             } catch (IOException ioe) {
                 LOG.error("Unable to write thumbnail file", ioe);
             } catch (InterruptedException | ExecutionException e) {

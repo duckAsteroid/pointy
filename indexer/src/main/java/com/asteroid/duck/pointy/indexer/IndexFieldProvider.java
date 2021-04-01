@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * The interface to a stage in the indexing pipeline
  */
-public interface PipelineStage {
+public interface IndexFieldProvider {
     String CHECKSUM_FIELD = "checksum";
     String FILENAME_FIELD = "filename";
 

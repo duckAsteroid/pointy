@@ -49,7 +49,7 @@ public class NewFileAction extends IndexAction {
                 // filenames
                 filenames.stream()
                         .map(IndexUpdateJob::pathString)
-                        .map(path -> new StoredField(PipelineStage.FILENAME_FIELD, path))
+                        .map(path -> new StoredField(IndexFieldProvider.FILENAME_FIELD, path))
                         .forEach(slideShowDocument::add);
 
                 // add it to the index

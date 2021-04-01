@@ -5,9 +5,7 @@ import com.asteroid.duck.pointy.indexer.scan.Candidate;
 import com.asteroid.duck.pointy.indexer.scan.FileScanner;
 import com.asteroid.duck.pointy.indexer.scan.IndexUpdateJob;
 import com.asteroid.duck.pointy.indexer.scan.IterableIndex;
-import com.asteroid.duck.pointy.indexer.scan.actions.IndexAction;
 import com.asteroid.duck.pointy.indexer.scan.actions.IndexContext;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -21,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Performs indexing using a supplied configuration - either updating
+ * or creating the index as required.
+ */
 public class Indexer implements AutoCloseable, IndexContext {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
@@ -83,8 +84,8 @@ public class Indexer implements AutoCloseable, IndexContext {
         if (reader != null) {
             IterableIndex iterableIndex = new IterableIndex(reader);
             for (Document doc : iterableIndex) {
-                String hash = doc.get(PipelineStage.CHECKSUM_FIELD);
-                String[] filenames = doc.getValues(PipelineStage.FILENAME_FIELD);
+                String hash = doc.get(IndexFieldProvider.CHECKSUM_FIELD);
+                String[] filenames = doc.getValues(IndexFieldProvider.FILENAME_FIELD);
                 current.put(hash, Arrays.asList(filenames));
             }
         }

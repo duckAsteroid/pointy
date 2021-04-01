@@ -1,6 +1,5 @@
 package com.asteroid.duck.pointy.indexer.scan.actions;
 
-import com.asteroid.duck.pointy.indexer.scan.IndexUpdateJob;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -9,14 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.asteroid.duck.pointy.indexer.PipelineStage.FILENAME_FIELD;
+import static com.asteroid.duck.pointy.indexer.IndexFieldProvider.FILENAME_FIELD;
 
 /**
  * An action to update the list of paths associated with a hashed file

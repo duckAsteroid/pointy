@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.asteroid.duck.pointy.indexer.PipelineStage.CHECKSUM_FIELD;
+import static com.asteroid.duck.pointy.indexer.IndexFieldProvider.CHECKSUM_FIELD;
 
 
 public abstract class IndexAction {

@@ -18,10 +18,10 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 /**
- * Interface to an object that can compute a checksum for a file.
- * This is used for "uniqueness" (so we only index a file once - even if it occurs in multiple places)
+ * Objects that can provide hashes or checksums for files
  */
 public enum Checksum implements Function<Path, CompletableFuture<String>> {
+    /** CRC32 checksum - as used by ZIP */
     CRC32 {
         private final CRC32 crc = new CRC32();
         public CompletableFuture<String> apply(Path path) {
@@ -40,6 +40,7 @@ public enum Checksum implements Function<Path, CompletableFuture<String>> {
                 });
         }
     },
+    /** SHA-1 as used by Git (?)*/
     SHA1 {
         @Override
         public CompletableFuture<String> apply(Path path) {

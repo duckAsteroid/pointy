@@ -3,7 +3,6 @@ package com.asteroid.duck.pointy.indexer;
 import com.asteroid.duck.pointy.Config;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.poi.sl.extractor.SlideShowExtractor;
@@ -14,7 +13,11 @@ import java.util.List;
 
 import static com.asteroid.duck.pointy.indexer.OptionalField.*;
 
-public class SlideTextIndexer implements PipelineStage {
+/**
+ * Can pull the text fields out of a slide show.
+ * Uses a configuration to determine which fields to pull.
+ */
+public class SlideTextIndexer implements IndexFieldProvider {
     private final String checksum;
     private final Slide<?,?> slide;
 
