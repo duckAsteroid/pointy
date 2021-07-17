@@ -1,6 +1,7 @@
 package com.asteroid.duck.pointy.indexer.scan;
 
 import com.asteroid.duck.pointy.indexer.scan.actions.*;
+import org.apache.commons.collections4.SetValuedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +14,17 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * A single instance of index updating process (trying to match what is now in file system)
- * Takes the current index (documents) and a stream of Paths
+ * Takes the current index (documents) and a stream of {@link Candidate}s (files)
  * From this calculates what actions need to be performed in this job
  */
 public class IndexUpdateJob {
     private static final Logger LOG = LoggerFactory.getLogger(IndexUpdateJob.class);
     /** The files in the index, by their file content hash */
-    Map<String, List<String>> filesByHash;
+    SetValuedMap<String, String> filesByHash;
     /** the resulting index actions for each file */
     private final Collection<IndexAction> actions = new LinkedList<>();
 
-    public IndexUpdateJob(Map<String, List<String>> filesByHash) {
+    public IndexUpdateJob(SetValuedMap<String, String> filesByHash) {
         this.filesByHash = filesByHash;
     }
 
@@ -38,7 +39,7 @@ public class IndexUpdateJob {
                 // hash exists in current index
                 // check the filenames
                 List<String> filenames = entry.getValue().stream().map(IndexUpdateJob::pathString).collect(toList());
-                List<String> currentFiles = filesByHash.get(hash);
+                Set<String> currentFiles = filesByHash.get(hash);
                 if(filenames.containsAll(currentFiles) && currentFiles.containsAll(filenames)) {
                     // same lists ...
                     actions.add(new DoNothingAction(hash));

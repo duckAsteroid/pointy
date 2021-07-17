@@ -42,7 +42,7 @@ class ColourSpaceTest {
     }
 
     @Test
-    void unity() {
-        assertEquals(12345, ColourSpace.UNITY.index(new Pixel(12345)));
+    void rgbUnity() {
+        assertEquals(12345, ColourSpace.RGB.index(new Pixel(12345)));
     }
 }

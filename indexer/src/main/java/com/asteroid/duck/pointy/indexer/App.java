@@ -27,16 +27,7 @@ public class App {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         if (args.length >= 2) {
             Path outputDir = Paths.get(args[0]);
-            Config.ConfigBuilder builder = Config.builder();
-            builder.fileTypes(FileType.all());
-            builder.analyzer(new StandardAnalyzer());
-            builder.checksum(Checksum.SHA1);
-            builder.metaDataFields(MetaDataField.all());
-            builder.showFields(Set.of(OptionalField.TITLE, OptionalField.CONTENT));
-            builder.slideFields(OptionalField.all());
-            builder.imageScale(0.5);
-            builder.imageFormat("JPG");
-            builder.imageColourSpace(ColourSpace.BinnedColourSpace.D27);
+            Config.ConfigBuilder builder = Config.withDefaults();
 
             builder.database(outputDir);
 

@@ -7,7 +7,10 @@ import java.util.Objects;
  */
 public abstract class ColourSpace {
 
-    public static final ColourSpace UNITY = new ColourSpace() {
+    /**
+     * The standard RGB colourspace - no transformation occurs
+     */
+    public static final ColourSpace RGB = new ColourSpace() {
         @Override
         public int index(Pixel pixel) {
             return pixel.getValue() & 0x00FFFFFF;
@@ -28,13 +31,21 @@ public abstract class ColourSpace {
         }
 
         @Override
+        public int[] coordinates(int index) {
+            return new int[] {
+                    Channel.red.extract(index),
+                    Channel.green.extract(index),
+                    Channel.blue.extract(index)};
+        }
+
+        @Override
         public boolean equals(Object o) {
-            return o == UNITY;
+            return o == RGB;
         }
     };
 
     /**
-     * Given a pixel determine which "cube" of the colourspace it fits in. Alpha is ignored
+     * Given a pixel determine which "cube" of the colourspace it fits in. Alpha is ignored.
      * @param pixel the pixel (with an aRGB colour)
      * @return the cube index
      */
@@ -44,11 +55,16 @@ public abstract class ColourSpace {
 
     public abstract int[] coordinates(int index, int count);
 
+    public abstract int[] coordinates(int index);
+
     public static class BinnedColourSpace extends ColourSpace {
         /**
-         * A sixty four bin colour space
+         * A sixty four bin colour space (4 per dimension)
          */
         public static final BinnedColourSpace D64 = new BinnedColourSpace(4);
+        /**
+         * A twenty seven bin colour space (3 per dimension)
+         */
         public static final BinnedColourSpace D27 = new BinnedColourSpace(3);
 
         private final int stepCount;
@@ -94,12 +110,18 @@ public abstract class ColourSpace {
 
         @Override
         public int[] coordinates(int index, int count) {
+            int[] coords = new int[]{0,0,0, count};
+            System.arraycopy(coordinates(index), 0, coords, 0, 3);
+            return coords;
+        }
+
+        public int[] coordinates(int index) {
             int b = Math.floorDiv(index , (stepCount * stepCount));
             index = index - (b * stepCount * stepCount);
             int g = Math.floorDiv(index , stepCount);
             index = index - (g * stepCount);
             int r = index;
-            return new int[]{r,g,b, count};
+            return new int[]{r,g,b};
         }
 
         @Override

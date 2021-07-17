@@ -6,6 +6,8 @@ import com.asteroid.duck.pointy.indexer.scan.FileScanner;
 import com.asteroid.duck.pointy.indexer.scan.IndexUpdateJob;
 import com.asteroid.duck.pointy.indexer.scan.IterableIndex;
 import com.asteroid.duck.pointy.indexer.scan.actions.IndexContext;
+import org.apache.commons.collections4.SetValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -14,7 +16,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.duck.asteroid.progress.ProgressMonitor;
+import io.github.duckasteroid.progress.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,7 @@ public class Indexer implements AutoCloseable, IndexContext {
         this.config = cfg;
         Path indexFolder = cfg.getIndexFolder();
         Directory indexDirectory = FSDirectory.open(indexFolder);
-        IndexWriterConfig indexConfig= new IndexWriterConfig(cfg.getAnalyzer());
+        IndexWriterConfig indexConfig= new IndexWriterConfig(cfg.getLuceneAnalyzer());
         this.writer = new IndexWriter(indexDirectory, indexConfig);
 
         this.reader = DirectoryReader.open(writer);
@@ -79,14 +81,14 @@ public class Indexer implements AutoCloseable, IndexContext {
         indexUpdateJob.getActions().forEach(action -> action.safeProcess(this));
     }
 
-    private Map<String, List<String>> currentIndex() {
-        Map<String, List<String>> current = new HashMap<>();
+    private SetValuedMap<String, String> currentIndex() {
+        SetValuedMap<String, String> current = new HashSetValuedHashMap<>();
         if (reader != null) {
             IterableIndex iterableIndex = new IterableIndex(reader);
             for (Document doc : iterableIndex) {
                 String hash = doc.get(IndexFieldProvider.CHECKSUM_FIELD);
                 String[] filenames = doc.getValues(IndexFieldProvider.FILENAME_FIELD);
-                current.put(hash, Arrays.asList(filenames));
+                current.putAll(hash, Arrays.asList(filenames));
             }
         }
         if (LOG.isDebugEnabled()) {
