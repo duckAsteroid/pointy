@@ -1,13 +1,7 @@
 package com.asteroid.duck.pointy.indexer.image;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ColourUtilsTest {
 
-    private static final ColourSpace.BinnedColourSpace twoBins = new ColourSpace.BinnedColourSpace(2);
-    private static final ColourSpace.BinnedColourSpace fourBins = new ColourSpace.BinnedColourSpace(4);
+    private static final BinnedColourSpace twoBins =  BinnedColourSpace.create(2);
+    private static final BinnedColourSpace fourBins =  BinnedColourSpace.create(4);
 
 
     @Test

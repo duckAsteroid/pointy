@@ -5,7 +5,7 @@ import com.asteroid.duck.pointy.indexer.scan.Candidate;
 import com.asteroid.duck.pointy.indexer.scan.FileScanner;
 import com.asteroid.duck.pointy.indexer.scan.IndexUpdateJob;
 import com.asteroid.duck.pointy.indexer.scan.IterableIndex;
-import com.asteroid.duck.pointy.indexer.scan.actions.IndexContext;
+import com.asteroid.duck.pointy.indexer.scan.actions.IndexActionContext;
 import org.apache.commons.collections4.SetValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.lucene.document.Document;
@@ -23,16 +23,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
  * Performs indexing using a supplied configuration - either updating
  * or creating the index as required.
  */
-public class Indexer implements AutoCloseable, IndexContext {
+public class Indexer implements AutoCloseable, IndexActionContext {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
     private final Config config;

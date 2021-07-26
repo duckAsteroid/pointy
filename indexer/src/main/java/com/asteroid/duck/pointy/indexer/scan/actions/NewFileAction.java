@@ -10,6 +10,8 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.poi.sl.usermodel.Slide;
 import org.apache.poi.sl.usermodel.SlideShow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import static org.apache.poi.sl.usermodel.SlideShowFactory.create;
  */
 public class NewFileAction extends IndexAction {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NewFileAction.class);
+
     private final Collection<Path> filenames;
 
     public NewFileAction(String checksum, Collection<Path> filenames) {
@@ -33,23 +37,23 @@ public class NewFileAction extends IndexAction {
     }
 
     @Override
-    public void process(IndexContext ctx) throws IOException {
+    public void process(IndexActionContext ctx) throws IOException {
         Config config = ctx.getConfig();
         Iterator<Path> iter = filenames.iterator();
         while (iter.hasNext()) {
-
+            final Path path = iter.next();
             try {
                 Document slideShowDocument = new Document();
                 slideShowDocument.add(IndexDocType.SLIDESHOW.asField());
 
-                String filename = IndexUpdateJob.pathString(iter.next());
+                String filename = IndexUpdateJob.pathString(path);
                 SlideShow<?, ?> slideShow = create(new File(filename));
                 SlideShowIndexer slideShowIdx = new SlideShowIndexer(checksum, slideShow, filenames);
                 slideShowIdx.index(config).forEach(slideShowDocument::add);
-                // filenames
+                // add all filenames into index
                 filenames.stream()
                         .map(IndexUpdateJob::pathString)
-                        .map(path -> new StoredField(IndexFieldProvider.FILENAME_FIELD, path))
+                        .map(p -> new StoredField(IndexFieldProvider.FILENAME_FIELD, p))
                         .forEach(slideShowDocument::add);
 
                 // add it to the index
@@ -78,9 +82,10 @@ public class NewFileAction extends IndexAction {
                     }
                     slideShow.close();
                 }
-                break; // no more iterating
+                break; // no more iterating - this file has served us well
             }
             catch(IOException e) {
+                LOG.warn("Unable to index file="+path, e);
                 // try next
                 if (!iter.hasNext()) {
                     throw new IOException("Tried all filenames", e);

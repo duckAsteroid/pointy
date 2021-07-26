@@ -5,7 +5,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 
-public interface IndexContext {
+public interface IndexActionContext {
     Config getConfig();
     IndexReader getReader();
     IndexWriter getWriter();

@@ -1,15 +1,19 @@
 package com.asteroid.duck.pointy;
 
 import com.asteroid.duck.pointy.indexer.OptionalField;
+import com.asteroid.duck.pointy.indexer.image.BinnedColourSpace;
 import com.asteroid.duck.pointy.indexer.image.ColourSpace;
 import com.asteroid.duck.pointy.indexer.metadata.MetaDataField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
@@ -19,12 +23,13 @@ import java.util.Set;
  */
 @Data
 @Jacksonized
-@Builder
+@Builder(toBuilder = true)
 public class Config {
     public enum Analyzer { STANDARD }
     /** What checksum algorithm to use for identity */
     private final Checksum checksum;
-    /** Path to the database */
+    /** Path to the database (root of index and image directory) */
+    @JsonIgnore
     private final Path database;
     /** Lucene text analyzer to use for indexing */
     private final Analyzer analyzer;
@@ -84,7 +89,21 @@ public class Config {
         builder.slideFields(OptionalField.all());
         builder.imageScale(0.5);
         builder.imageFormat("JPG");
-        builder.imageColourSpace(ColourSpace.BinnedColourSpace.D27);
+        builder.imageColourSpace(BinnedColourSpace.D27);
         return builder;
+    }
+
+    public static Config readFrom(final Path database) throws IOException {
+        if (database == null) throw new IllegalArgumentException("Path cannot be null");
+        if (!Files.isDirectory(database)) throw new IllegalArgumentException("Path is not a directory");
+
+        Path cfgFile = database.resolve(".config");
+        if (!Files.exists(cfgFile)) throw new IllegalArgumentException("No config file in this directory");
+
+        ObjectMapper mapper = new ObjectMapper();
+        try (InputStream stream = Files.newInputStream(cfgFile)) {
+            Config cfg = mapper.readValue(stream, Config.class);
+            return cfg.toBuilder().database(database).build();
+        }
     }
 }

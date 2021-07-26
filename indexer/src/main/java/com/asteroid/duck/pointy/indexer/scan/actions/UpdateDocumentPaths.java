@@ -29,11 +29,11 @@ public class UpdateDocumentPaths extends IndexAction {
     }
 
     @Override
-    public void process(IndexContext ctx) throws IOException {
+    public void process(IndexActionContext ctx) throws IOException {
         Document doc = document(ctx).orElseThrow(() -> new IllegalArgumentException("Can't find document with ID="+getChecksum()));
         // create a collection containing everything but the filenames
-        List<IndexableField> fields = new ArrayList<>(doc.getFields()).stream()
-                .filter(f -> !f.name().equals(FILENAME_FIELD)).collect(Collectors.toList());
+        List<IndexableField> fields = new ArrayList<>(doc.getFields().stream()
+                .filter(f -> !f.name().equals(FILENAME_FIELD)).collect(Collectors.toList()));
         // create a list of fields containing the new paths
         List<StringField> newPathFields = paths.stream()
                 .map(path -> new StringField(FILENAME_FIELD, path, Field.Store.YES))

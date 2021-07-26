@@ -30,7 +30,7 @@ public abstract class IndexAction {
         return new Term(CHECKSUM_FIELD, getChecksum());
     }
 
-    public Optional<Document> document(IndexContext ctx)  {
+    public Optional<Document> document(IndexActionContext ctx)  {
         try {
             TopDocs topDocs = ctx.getSearcher().search(new TermQuery(getDocumentID()), 1);
             if (topDocs.totalHits.value > 0) {
@@ -43,7 +43,7 @@ public abstract class IndexAction {
         return Optional.empty();
     }
 
-    public void safeProcess(IndexContext ctx) {
+    public void safeProcess(IndexActionContext ctx) {
         try {
             process(ctx);
         }
@@ -52,5 +52,5 @@ public abstract class IndexAction {
         }
     }
 
-    protected abstract void process(IndexContext ctx) throws IOException;
+    protected abstract void process(IndexActionContext ctx) throws IOException;
 }

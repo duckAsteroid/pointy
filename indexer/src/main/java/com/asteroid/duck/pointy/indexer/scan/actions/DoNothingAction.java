@@ -9,7 +9,7 @@ public class DoNothingAction extends IndexAction {
     }
 
     @Override
-    protected void process(IndexContext ctx) throws IOException {
+    protected void process(IndexActionContext ctx) throws IOException {
         // does nothing
     }
 }

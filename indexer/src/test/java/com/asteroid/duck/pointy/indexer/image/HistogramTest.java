@@ -6,13 +6,12 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HistogramTest {
 
-    private final ColourSpace.BinnedColourSpace space = new ColourSpace.BinnedColourSpace(4);
+    private final BinnedColourSpace space = BinnedColourSpace.create(4);
     private final List<Pixel> pixels = Arrays.asList(
             new Pixel(0x000000), // 0
             new Pixel(0x7F7F7F), //

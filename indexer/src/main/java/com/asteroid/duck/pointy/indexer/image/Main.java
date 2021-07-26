@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,7 +11,7 @@ import java.util.stream.IntStream;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
-            ColourSpace.BinnedColourSpace colourSpace = ColourSpace.BinnedColourSpace.D64;
+            BinnedColourSpace colourSpace = BinnedColourSpace.D64;
             if ("HIST".equalsIgnoreCase(args[0])) {
                 for (int i = 1; i < args.length; i++) {
                     System.out.println("Image:"+args[i]);
@@ -36,11 +35,11 @@ public class Main {
     public static List<Long> histogram(String fileName, ColourSpace colorSpace) throws IOException {
         BufferedImage image = ImageIO.read(new File(fileName));
         int bins = 4;
-        ColourSpace.BinnedColourSpace space = new ColourSpace.BinnedColourSpace(bins);
+        BinnedColourSpace space = BinnedColourSpace.create(bins);
         return ColourUtils.histogram(image, space);
     }
 
-    public static List<String> print(List<Long> histogram, ColourSpace.BinnedColourSpace space) {
+    public static List<String> print(List<Long> histogram, BinnedColourSpace space) {
         return IntStream.range(0, histogram.size())
                 .mapToObj(i ->  i + ",0x" + Integer.toHexString(space.midPointColour(i)).toUpperCase() + "," + histogram.get(i))
                 .collect(Collectors.toList());

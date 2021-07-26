@@ -15,7 +15,7 @@ public class RemoveFromIndexAction extends IndexAction {
     }
 
     @Override
-    protected void process(IndexContext ctx) throws IOException {
+    protected void process(IndexActionContext ctx) throws IOException {
         ctx.getWriter().deleteDocuments(getDocumentID());
         // delete the folder of images too
         Path slideFolder = ctx.getConfig().getSlideFolder(checksum);
