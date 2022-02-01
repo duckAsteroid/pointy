@@ -1,7 +1,9 @@
 package com.asteroid.duck.pointy.indexer;
 
 import com.asteroid.duck.pointy.Config;
+import com.asteroid.duck.pointy.indexer.metadata.CoreFields;
 import com.asteroid.duck.pointy.indexer.metadata.MetaDataExtractor;
+import com.asteroid.duck.pointy.indexer.metadata.OptionalField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -20,7 +22,7 @@ import static java.util.stream.Collectors.joining;
  */
 public class SlideShowIndexer implements IndexFieldProvider {
 
-    private static final String PATH_FIELD = "pathContent";
+    public static final String PATH_FIELD = "pathContent";
 
     private final String checksum;
     private final SlideShow<?, ?> slideShow;
@@ -46,7 +48,7 @@ public class SlideShowIndexer implements IndexFieldProvider {
     }
 
     public StringField checksum() {
-        return new StringField(CHECKSUM_FIELD, checksum, Field.Store.YES);
+        return new StringField(CoreFields.CHECKSUM_FIELD.getFieldName(), checksum, Field.Store.YES);
     }
 
     public TextField content() {

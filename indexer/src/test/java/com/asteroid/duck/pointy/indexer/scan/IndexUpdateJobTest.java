@@ -1,17 +1,15 @@
 package com.asteroid.duck.pointy.indexer.scan;
 
 import com.asteroid.duck.pointy.indexer.scan.actions.IndexAction;
+import io.github.duckasteroid.progress.ProgressMonitorFactory;
 import org.apache.commons.collections4.SetValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +37,7 @@ class IndexUpdateJobTest {
 		scanResult.add(new Candidate(Paths.get("c:/f/g/four.pptx"), "0xABCD"));
 
 		// create actions
-		subject.process(scanResult.stream());
+		subject.process(scanResult.stream(), ProgressMonitorFactory.newMonitor("Test", 1));
 		// check actions are what we expect
 		List<IndexAction> actions = subject.getActions().collect(Collectors.toList());
 		assertEquals(5, actions.size());

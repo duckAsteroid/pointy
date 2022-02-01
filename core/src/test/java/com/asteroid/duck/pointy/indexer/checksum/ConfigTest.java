@@ -1,5 +1,6 @@
-package com.asteroid.duck.pointy;
+package com.asteroid.duck.pointy.indexer.checksum;
 
+import com.asteroid.duck.pointy.Config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
-package com.asteroid.duck.pointy.indexer;
+package com.asteroid.duck.pointy.indexer.metadata;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represent optional fields on slides and/or shows
+ * Represents the optional fields on slides and/or shows that might be indexed
  */
 public enum OptionalField {
     SLIDE_NO,

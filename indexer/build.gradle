@@ -1,9 +1,15 @@
-apply plugin: 'application'
+plugins {
+    id 'application'
+    id "io.freefair.lombok"
+}
+description = "Core indexing function (and application) for pointy"
 
 dependencies {
     // SLF4J API for logging, with Logback bindings
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30')
     runtime( group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3')
+
+    implementation project(':core')
 
     // Pico CLI for command line parsing
     implementation 'info.picocli:picocli:4.6.1'
@@ -16,7 +22,9 @@ dependencies {
     // Progress reporting library
     implementation('io.github.duckasteroid.progress:api:1.2.0')
     implementation('io.github.duckasteroid.progress:client:1.2.0')
-    implementation('io.github.duckasteroid.progress:slf4j:1.2.0')
+    //implementation('io.github.duckasteroid.progress:slf4j:1.2.0')
+    implementation('io.github.duckasteroid.progress:console:1.2.0')
+    //implementation('io.github.duckasteroid.progress:utils:1.2.0')
 
     // Apache POI for handling power point files
     implementation( group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0')
@@ -40,6 +48,22 @@ test {
     useJUnitPlatform()
 }
 
-run {
-    args( file('build/index-test'), file('src/test/resources/presentations'))
+task localRun(type: JavaExec) {
+    group = 'Run' // <-- change the name as per your need
+    description = 'Indexes the test data into index-test'
+
+    classpath sourceSets.main.runtimeClasspath
+    main = 'com.asteroid.duck.pointy.indexer.App'
+    args file('build/index-test'), file('src/test/resources/presentations/images'), file('src/test/resources/presentations/test')
 }
+
+task myMachine(type: JavaExec) {
+    group = 'Run'
+    description = "Index powerpoint in home folder into DB in home folder"
+
+    classpath sourceSets.main.runtimeClasspath
+    main = 'com.asteroid.duck.pointy.indexer.App'
+    args ('c:/Users/chris/~pointy', 'c:/Users/chris/')
+}
+
+

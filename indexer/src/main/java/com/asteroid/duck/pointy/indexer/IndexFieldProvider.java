@@ -6,11 +6,9 @@ import org.apache.lucene.index.IndexableField;
 import java.util.List;
 
 /**
- * The interface to a stage in the indexing pipeline
+ * The interface to a stage in the indexing pipeline - something that can create fields
  */
 public interface IndexFieldProvider {
-    String CHECKSUM_FIELD = "checksum";
-    String FILENAME_FIELD = "filename";
 
     List<IndexableField> index(Config cfg);
 }

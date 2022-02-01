@@ -2,6 +2,8 @@ package com.asteroid.duck.pointy.indexer;
 
 import com.asteroid.duck.pointy.Config;
 import com.asteroid.duck.pointy.indexer.image.*;
+import com.asteroid.duck.pointy.indexer.metadata.CoreFields;
+import com.asteroid.duck.pointy.indexer.metadata.OptionalField;
 import org.apache.commons.math3.util.Pair;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntPoint;
@@ -29,8 +31,6 @@ import static java.util.stream.Collectors.toList;
  */
 public class SlideImageIndexer implements IndexFieldProvider {
 
-    public static final String THUMBNAIL_PATH_FIELD = "thumbnailPath";
-
     private static final Logger LOG = LoggerFactory.getLogger(SlideImageIndexer.class);
 
     private final Path slideImageFolder;
@@ -45,38 +45,43 @@ public class SlideImageIndexer implements IndexFieldProvider {
     public List<IndexableField> index(Config cfg) {
         List<IndexableField> result = new LinkedList<>();
         ImageExtractor extractor = new ImageExtractor(cfg.getImageScale(), slide.getSlideShow().getPageSize());
-        BufferedImage bufferedImage = extractor.render(slide);
-        if (cfg.getSlideFields().contains(OptionalField.IMAGE_COLOR_SPACE)) {
-            ColourSpace space = cfg.getImageColourSpace();
-            List<Long> histogram = ColourUtils.histogram(bufferedImage, space);
-            List<Double> counts = Histogram.normalisePixelCount(histogram);
-            List<Integer> ranged = counts.stream().map(d -> (int) (d * 255)).collect(Collectors.toUnmodifiableList());
-            List<Pair<Integer, Integer>> indexData = IntStream.range(0, ranged.size())
-                    .filter(i -> ranged.get(i) > 0)
-                    .mapToObj(i -> Pair.create(i, ranged.get(i)))
-                    .collect(toList());
-            indexData.stream()
-                    .map(pair -> space.coordinates(pair.getKey(), pair.getValue()))
-                    .map(coords -> new IntPoint("colours", coords))
-                    .forEach(result::add);
-            String histogramRender = indexData.stream().map(pair -> pair.getKey()+":"+pair.getValue())
-                    .collect(Collectors.joining(", ", "[", "]"));
-            result.add(new StoredField("histogram", histogramRender));
-        }
-
-        if (cfg.getSlideFields().contains(OptionalField.IMAGE)) {
-            Path thumbnailPath = thumbnailPath(cfg);
-            try {
-                Files.createDirectories(thumbnailPath.getParent());
-                ImageIO.write(bufferedImage, cfg.getImageFormat(), Files.newOutputStream(thumbnailPath));
-                result.add(new StoredField(THUMBNAIL_PATH_FIELD, thumbnailPath.toString()));
-                String checksum = cfg.getChecksum().apply(thumbnailPath).get();
-                result.add(new StringField(IndexFieldProvider.CHECKSUM_FIELD, checksum, Field.Store.YES));
-            } catch (IOException ioe) {
-                LOG.error("Unable to write thumbnail file", ioe);
-            } catch (InterruptedException | ExecutionException e) {
-                LOG.error("Error computing checksum", e);
+        try {
+            BufferedImage bufferedImage = extractor.render(slide);
+            if (cfg.getSlideFields().contains(OptionalField.IMAGE_COLOR_SPACE)) {
+                ColourSpace space = cfg.getImageColourSpace();
+                List<Long> histogram = ColourUtils.histogram(bufferedImage, space);
+                List<Double> counts = Histogram.normalisePixelCount(histogram);
+                List<Integer> ranged = counts.stream().map(d -> (int) (d * 255)).collect(Collectors.toUnmodifiableList());
+                List<Pair<Integer, Integer>> indexData = IntStream.range(0, ranged.size())
+                        .filter(i -> ranged.get(i) > 0)
+                        .mapToObj(i -> Pair.create(i, ranged.get(i)))
+                        .collect(toList());
+                indexData.stream()
+                        .map(pair -> space.coordinates(pair.getKey(), pair.getValue()))
+                        .map(coords -> new IntPoint("colours", coords))
+                        .forEach(result::add);
+                String histogramRender = indexData.stream().map(pair -> pair.getKey() + ":" + pair.getValue())
+                        .collect(Collectors.joining(", ", "[", "]"));
+                result.add(new StoredField("histogram", histogramRender));
             }
+
+            if (cfg.getSlideFields().contains(OptionalField.IMAGE)) {
+                Path thumbnailPath = thumbnailPath(cfg);
+                try {
+                    Files.createDirectories(thumbnailPath.getParent());
+                    ImageIO.write(bufferedImage, cfg.getImageFormat(), Files.newOutputStream(thumbnailPath));
+                    result.add(new StoredField(CoreFields.THUMBNAIL_PATH_FIELD.getFieldName(), thumbnailPath.toString()));
+                    String checksum = cfg.getChecksum().apply(thumbnailPath).get();
+                    result.add(new StringField(CoreFields.CHECKSUM_FIELD.getFieldName(), checksum, Field.Store.YES));
+                } catch (IOException ioe) {
+                    LOG.error("Unable to write thumbnail file", ioe);
+                } catch (InterruptedException | ExecutionException e) {
+                    LOG.error("Error computing checksum", e);
+                }
+            }
+        }
+        catch(Throwable ioe) {
+            LOG.error("Error extracting image", ioe);
         }
         return result;
     }

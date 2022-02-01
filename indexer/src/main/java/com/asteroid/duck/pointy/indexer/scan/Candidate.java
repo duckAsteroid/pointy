@@ -16,7 +16,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.*;
 
 /**
- * Represents a file in the file system together with it's computed checksum
+ * Represents a pair of a checksum and a path.
+ * With some utility methods to create from a stream and to create a Map of paths by checksum.
  */
 @Data
 public class Candidate {

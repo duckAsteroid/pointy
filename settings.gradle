@@ -1,4 +1,5 @@
 rootProject.name = 'pointy'
 include('core')
-include('scanner')
+//include('scanner')
 include('indexer')
+include('query')

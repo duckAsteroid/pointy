@@ -13,7 +13,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Provides a depth first recursive stream of files that end with a desired suffix from a given starting path.
+ * Provides a depth first recursive stream of files that match a file type
+ * from a given starting path.
  * i.e. A way to find all powerpoint files under a directory
  */
 public class FileScanner {

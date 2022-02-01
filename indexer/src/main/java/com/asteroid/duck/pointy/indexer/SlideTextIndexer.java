@@ -11,7 +11,7 @@ import org.apache.poi.sl.usermodel.Slide;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.asteroid.duck.pointy.indexer.OptionalField.*;
+import static com.asteroid.duck.pointy.indexer.metadata.OptionalField.*;
 
 /**
  * Can pull the text fields out of a slide show.

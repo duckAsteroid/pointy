@@ -1,18 +1,14 @@
 package com.asteroid.duck.pointy.indexer.scan.actions;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
+import io.github.duckasteroid.progress.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import static com.asteroid.duck.pointy.indexer.IndexFieldProvider.CHECKSUM_FIELD;
-
-
+/**
+ * Some action that must be performed to bring the index into sync with the filesystem
+ */
 public abstract class IndexAction {
     private static final Logger LOG = LoggerFactory.getLogger(IndexAction.class);
 
@@ -26,31 +22,20 @@ public abstract class IndexAction {
         return checksum;
     }
 
-    public Term getDocumentID() {
-        return new Term(CHECKSUM_FIELD, getChecksum());
-    }
-
-    public Optional<Document> document(IndexActionContext ctx)  {
+    public void safeProcess(IndexActionContext ctx, ProgressMonitor monitor) {
         try {
-            TopDocs topDocs = ctx.getSearcher().search(new TermQuery(getDocumentID()), 1);
-            if (topDocs.totalHits.value > 0) {
-                return Optional.of(ctx.getReader().document(topDocs.scoreDocs[0].doc));
-            }
+            process(ctx, monitor);
         }
-        catch(IOException e) {
-            LOG.error("Error processing index action", e);
-        }
-        return Optional.empty();
-    }
-
-    public void safeProcess(IndexActionContext ctx) {
-        try {
-            process(ctx);
-        }
-        catch(IOException e) {
+        catch(Throwable e) {
             LOG.error("Error processing", e);
         }
     }
 
-    protected abstract void process(IndexActionContext ctx) throws IOException;
+    protected abstract void process(IndexActionContext ctx, ProgressMonitor monitor) throws IOException;
+
+    public String getName() {
+        return checksum + " " + getTaskName();
+    }
+
+	protected abstract String getTaskName();
 }

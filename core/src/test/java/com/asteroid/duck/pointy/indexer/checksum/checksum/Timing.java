@@ -1,4 +1,4 @@
-package com.asteroid.duck.pointy.indexer.checksum;
+package com.asteroid.duck.pointy.indexer.checksum.checksum;
 
 public class Timing {
     private long startTime;

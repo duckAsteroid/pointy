@@ -1,5 +1,6 @@
 package com.asteroid.duck.pointy.indexer.scan.actions;
 
+import io.github.duckasteroid.progress.ProgressMonitor;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -15,10 +16,19 @@ public class RemoveFromIndexAction extends IndexAction {
     }
 
     @Override
-    protected void process(IndexActionContext ctx) throws IOException {
-        ctx.getWriter().deleteDocuments(getDocumentID());
+    protected void process(IndexActionContext ctx, ProgressMonitor monitor) throws IOException {
+        monitor.setSize(2);
+        ctx.delete(getChecksum());
+        monitor.worked(1, "Deleted document from index");
         // delete the folder of images too
         Path slideFolder = ctx.getConfig().getSlideFolder(checksum);
         FileUtils.deleteDirectory(slideFolder.toFile());
+        monitor.worked(1, "Removed thumbnail images");
+        monitor.done();
+    }
+
+    @Override
+    public String getTaskName() {
+        return "remove";
     }
 }
